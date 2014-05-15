@@ -683,6 +683,7 @@ TOGENT tog_table[] =
   {"HIDEIDLE", TOG_HIDEIDLE, 'h', 1, 0, th_wiz},
   {"MORTALREALITY", TOG_MORTALREALITY, 'M', 1, 0, th_wiz},
   {"ACCENTS", TOG_ACCENTS, 'X', 1, 0, th_player},
+  {"BYTES", TOG_BYTES, 'B', 1, 0, th_player},
   {"MAILVALIDATE", TOG_PREMAILVALIDATE, '-', 1, 0, th_player},
   {"CLUSTER", TOG_CLUSTER, '~', 0, CA_IMMORTAL, th_noset},
   {"SAFELOG", TOG_SAFELOG, 'Y', 1, 0, th_player},
@@ -899,6 +900,7 @@ FLAGENT gen_flags[] =
   {"ZONEPARENT", ZONEPARENT, 'y', FLAG4, 0, 0, 0, fh_any},
   {"HAS_PROTECT", HAS_PROTECT, '+', FLAG4, CA_GOD | CA_NO_DECOMP, 0, 0, fh_god},
   {"XTERMCOLOR", XTERMCOLOR, 't', FLAG4, 0, 0, 0, fh_any},
+  {"MXPCOLOR", MXPCOLOR, 'm', FLAG4, 0, 0, 0, fh_any},
   {"", 0, ' ', 0, 0, 0, 0, NULL}
 };
 

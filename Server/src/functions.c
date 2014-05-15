@@ -70,11 +70,12 @@ typedef struct PENN_COLORMAP {
   int i_xterm;
 } PENNANSI;
 
-typedef struct MUX_COLORMAP {
+//Moved to externs.h for fansi patch
+/*typedef struct MUX_COLORMAP {
   int i_dec;
   char *s_hex;
 } MUXANSI;
-
+*/
 
 char *ansi_translate_16[257]={
    "x", "r", "g", "y", "b", "m", "c", "w",
@@ -111,7 +112,8 @@ char *ansi_translate_16[257]={
    "wh", "wh", "wh", "wh", "wh", "wh", "wh", "wh", (char *)NULL,
 };
 
-#ifdef ZENTY_ANSI
+//Moved to externs.h for fansi patch
+/*#ifdef ZENTY_ANSI
 static struct MUX_COLORMAP mux_namecolors[] = {
     {0, "000000"},
     {1, "800000"},
@@ -371,7 +373,7 @@ static struct MUX_COLORMAP mux_namecolors[] = {
     {255, "eeeeee"},
     {0, NULL},
 };
-#endif
+#endif*/
 
 static struct PENN_COLORMAP penn_namecolors[]= {
    {"aliceblue", 15 },
@@ -26225,15 +26227,28 @@ FUNCTION(fun_chr)
          safe_str("#-1 ARGUMENT NOT A NUMBER", buff, bufcx);
     } else {
          i = atoi(fargs[0]);
+         //For some reason this works with BYTES
          if ( (i == 37) || (i == 92) || (i < 32) || (i > 126)) {
-             if ( (i == 37) || (i == 92) || ((i >= 160) && (i <= 255)) ) {
+            //Disable old handling
+/*             if ( (i == 37) || (i == 92) || ((i >= 160) && (i <= 255)) ) {
                 sprintf(s_buff, "%%<%03d>", i); 
                 safe_str(s_buff, buff, bufcx);
              } else
-                safe_str("#-1 ARGUMENT OUT OF RANGE", buff, bufcx);
+                safe_str("#-1 ARGUMENT OUT OF RANGE", buff, bufcx);*/
+
+             //Enable all bytes if BYTES toggle active...weird that it works.
+            if((i >= 1 && i <= 6) || (i >= 11 && i <= 26) || 
+                (i >= 27 && i <= 254)) {
+              sprintf(s_buff, "%%<%03d>", i);
+              safe_str(s_buff, buff, bufcx);
+            } else {
+              safe_str("#-1 ARGUMENT OUT OF RANGE", buff, bufcx);
+            }
          } else {
             safe_chr((char)i, buff, bufcx);
          }
+
+
     }
 }
 

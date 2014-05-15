@@ -173,7 +173,7 @@
 #define NOCODE		0x00200000	/* Players may not code */
 #define HAS_PROTECT	0x00400000	/* Player target has protect name data */
 #define XTERMCOLOR      0x00800000      /* Extended AnSI Xterm colors */
-/* 0x01000000 free */
+#define MXPCOLOR        0x01000000     /* 0x01000000 free */
 /* 0x02000000 free */
 /* 0x04000000 free */
 /* 0x08000000 free */
@@ -244,7 +244,7 @@
 #define TOG_ACCENTS		0x00400000	/* Accents being displayed */
 #define TOG_PREMAILVALIDATE	0x00800000	/* Pre-Validate the mail send list before sending mail */
 #define TOG_SAFELOG             0x01000000	/* Allow 'clean logging' by the player */
-/* 0x02000000 free */
+#define TOG_BYTES            0x02000000 /* Send all 256 bytes to telnet */
 /* 0x04000000 free */
 #define TOG_NODEFAULT		0x08000000	/* Allow target to inherit default attribs */
 #define TOG_EXFULLWIZATTR	0x10000000	/* Examine Wiz attribs */
@@ -635,6 +635,7 @@ extern int	FDECL(has_aflag, (dbref, dbref, int, char *));
 #define TogHideIdle(x)	((Toggles2(x) & TOG_HIDEIDLE) != 0)
 #define TogMortReal(x)	((Toggles2(x) & TOG_MORTALREALITY) != 0)
 #define Accents(x)	((Toggles2(x) & TOG_ACCENTS) != 0)
+#define Bytes(x)    ((Toggles2(x) & TOG_BYTES) != 0)
 #define MailValid(x)	((Toggles2(x) & TOG_PREMAILVALIDATE) != 0)
 #define KeepAlive(x)	((Toggles2(x) & TOG_KEEPALIVE) != 0)
 #define ChkReality(x)	((Toggles2(x) & TOG_CHKREALITY) != 0)
@@ -797,6 +798,7 @@ extern int	FDECL(has_aflag, (dbref, dbref, int, char *));
 #define ShowAnsi(x)	((Flags2(x) & ANSI) != 0)
 #define ShowAnsiColor(x)	((Flags2(x) & ANSICOLOR) != 0)
 #define ShowAnsiXterm(x)	((Flags4(x) & XTERMCOLOR) != 0)
+#define ShowAnsiMXP(x)      ((Flags4(x) & MXPCOLOR) != 0)
 #define NoFlash(x)	((Flags2(x) & NOFLASH) != 0)
 #define NoUnderline(x)	((Flags4(x) & NOUNDERLINE) != 0)
 #define NoName(x)	((Flags4(x) & NONAME) != 0)

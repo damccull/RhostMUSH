@@ -583,7 +583,7 @@ dflt_from_msg(dbref sender, dbref sendloc)
 void 
 notify_check(dbref target, dbref sender, const char *msg, int port, int key, int i_type)
 {
-    char *msg_ns, *mp, *msg_ns2, *mp2, *tbuff, *tp, *buff, *s_tstr, *s_tbuff;
+    char *msg_ns, *mp, *msg_ns2, *mp2, *msg_ns3, *mp3, *tbuff, *tp, *buff, *s_tstr, *s_tbuff;
     char *args[10], *s_logroom, *cpulbuf, *s_aptext, *s_aptextptr, *s_strtokr;
     dbref aowner, targetloc, recip, obj, i_apowner, passtarget;
     int i, nargs, aflags, has_neighbors, pass_listen, noansi=0;
@@ -597,6 +597,7 @@ notify_check(dbref target, dbref sender, const char *msg, int port, int key, int
        args[i] = NULL;
 
     msg_ns2 = NULL;
+    msg_ns3 = NULL;
     cpulbuf = NULL;
     /* If speaker is invalid or message is empty, just exit */
 
@@ -620,7 +621,8 @@ notify_check(dbref target, dbref sender, const char *msg, int port, int key, int
 
     if (key & MSG_ME) {
 	mp = msg_ns = alloc_lbuf("notify_check");
-	mp2 = msg_ns2 = alloc_lbuf("notify_check_accents");
+  mp2 = msg_ns2 = alloc_lbuf("notify_check_accents");
+	mp3 = msg_ns3 = alloc_lbuf("notify_check_bytes");
 	if (!port && Nospoof(target) &&
 	    (target != sender) &&
 	    ((!Wizard(sender) || (Wizard(sender) && Immortal(target))) || (Spoof(sender) || Spoof(Owner(sender)))) &&
@@ -654,11 +656,17 @@ notify_check(dbref target, dbref sender, const char *msg, int port, int key, int
 	}
 #ifdef ZENTY_ANSI       
        if(!(key & MSG_NO_ANSI)) {
-           parse_ansi((char *) msg, msg_ns, &mp, msg_ns2, &mp2);
+           parse_ansi((char *) msg, msg_ns, &mp, msg_ns2, &mp2, msg_ns3, &mp3);
            *mp = '\0';
            *mp2 = '\0';
+           *mp3 = '\0';
            if ( Accents(target) ) {
               memcpy(msg_ns, msg_ns2, LBUF_SIZE);
+              if(Bytes(target)) {
+                memcpy(msg_ns, msg_ns3, LBUF_SIZE);
+                /*notify(2,unsafe_tprintf("NS3: %s", msg_ns3));
+                notify(2,unsafe_tprintf("NS: %s", msg_ns));*/
+              }
            } 
        } else
 #endif
@@ -667,6 +675,7 @@ notify_check(dbref target, dbref sender, const char *msg, int port, int key, int
 #ifdef ZENTY_ANSI       
 #endif
         free_lbuf(msg_ns2);
+        free_lbuf(msg_ns3);
     } else {
 	msg_ns = NULL;
     }

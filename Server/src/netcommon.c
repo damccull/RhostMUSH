@@ -400,13 +400,16 @@ char *ansi_translate_fg[257]={
 };
 
 static char *
-strip_ansi_xterm(const char *raw)
+strip_ansi_xterm(DESC * d, const char *raw)
 {
-    static char buf[LBUF_SIZE];
+    //static char buf[LBUF_SIZE];
+    char *buf, *bufptr;
     char *p = (char *) raw;
-    char *q = buf;
+    //char *q = buf;
     char *r;
     int i_val, i_chk, i_type, i_chk2;
+
+    bufptr = buf = alloc_lbuf("strip_xterm");
 
     DPUSH; /* #104 */
 
@@ -415,14 +418,30 @@ strip_ansi_xterm(const char *raw)
 
     while (p && *p) {
 	if (*p != ESC_CHAR) {
-	    *q++ = *p++;
+	    //*q++ = *p++;
+      if(!ShowAnsiMXP(d->player)) {
+        safe_chr(*p,buf,&bufptr);
+      } else {
+        if(*p == '>') {
+          safe_str("&gt;",buf,&bufptr);
+        } else if(*p == '<') {
+          safe_str("&lt;",buf,&bufptr);
+        } else if(*p == '&') {
+          safe_str("&amp;",buf,&bufptr);
+        } else if(*p == '"') {
+          safe_str("&quot;",buf,&bufptr);
+        } else {
+          safe_chr(*p,buf,&bufptr);
+        }
+      }
+      p++;
 	} else {
 	    /* We've got an ANSI code here -- verify it's XTERM codes */
             if ( (*(p+1) && (*(p+1) == '[')) && (*(p+2) && ((*(p+2) == '4') || (*(p+2) == '3'))) && (*(p+3) && (*(p+3) == '8')) ) {
                if ( *(p+2) == '3' ) {
-                  i_type = 0;
+                  i_type = 0; //Foreground
                } else {
-                  i_type = 1;
+                  i_type = 1; //Background
                }
                i_chk = 0;
 	       while (*p && !isalpha((int)*p)) {
@@ -432,13 +451,27 @@ strip_ansi_xterm(const char *raw)
                      i_chk2 = -1;
                      sscanf( p+1, "%d", &i_chk2);
                      if ( (i_chk2 >= 0) && (i_chk2 < 256) ) {
-                        if ( i_type ) {
-                           r = ansi_translate_bg[i_chk2];
+                        if(!ShowAnsiMXP(d->player)){  
+                          if ( i_type ) {
+                             r = ansi_translate_bg[i_chk2];
+                          } else {
+                             r = ansi_translate_fg[i_chk2];
+                          }
                         } else {
-                           r = ansi_translate_fg[i_chk2];
+                          r = mux_namecolors[i_chk2].s_hex;
+                        }
+                        if(ShowAnsiMXP(d->player)){
+                          //Write out the prepend for MXP
+                            safe_str(ESC_CHAR + "[1z",buf,&bufptr);
                         }
                         while ( r && *r ) {
-	                   *q++ = *r++;
+	                   //*q++ = *r++;
+                          safe_chr(*r,buf,&bufptr);
+                          r++;
+                        }
+                        if(ShowAnsiMXP(d->player)){
+                          //Write out the append for MXP
+                            safe_str(ESC_CHAR + "[3z",buf,&bufptr);
                         }
                      }
                      i_chk++;
@@ -448,12 +481,20 @@ strip_ansi_xterm(const char *raw)
                if ( *p )
                   p++;
             } else {
-	       *q++ = *p++;
+	       //*q++ = *p++;
+              safe_chr(*p,buf,&bufptr);
+              p++;
             }
         }
     }
-    *q = '\0';
-    RETURN(buf); /* #104 */
+    //*q = '\0';
+
+    static char outbuf[LBUF_SIZE-2];
+    char *q = outbuf;
+    strncpy(q,buf,LBUF_SIZE);
+    free_lbuf(buf);
+
+    RETURN(outbuf); /* #104 */
 }
 
 extern char *
@@ -1429,7 +1470,7 @@ raw_broadcast(va_alist)
     char *buff;
     char antemp[20];
 #ifdef ZENTY_ANSI
-    char *message, *mptr, *msg_ns2, *mp_ns2;
+    char *message, *mptr, *msg_ns2, *mp_ns2, *msg_ns3, *mp_ns3;
 #endif
     DESC *d;
     va_list ap;
@@ -1459,8 +1500,10 @@ raw_broadcast(va_alist)
 #ifdef ZENTY_ANSI   
     mptr = message = alloc_lbuf("raw_broadcast_message");
     mp_ns2 = msg_ns2 = alloc_lbuf("notify_check_accents");
-    parse_ansi( (char *) buff, message, &mptr, msg_ns2, &mp_ns2);
+    mp_ns3 = msg_ns3 = alloc_lbuf("notify_check_bytes");
+    parse_ansi( (char *) buff, message, &mptr, msg_ns2, &mp_ns2, msg_ns3, &mp_ns3);
     *mp_ns2 = '\0';
+    *mp_ns3 = '\0';
 #endif   
     strcpy(antemp, ANSI_NORMAL);
     DESC_ITER_CONN(d) {
@@ -1473,8 +1516,13 @@ raw_broadcast(va_alist)
 	     ((inflags & WIZARD) && Wizard(d->player)) ||
 	     ((inflags & IMMORTAL) && Immortal(d->player)))) {
 #ifdef ZENTY_ANSI	   
-           if ( Accents(d->player ) )
-              queue_string(d, msg_ns2);
+           if ( Accents(d->player ) ) {
+              if(Bytes(d->player)) {
+                queue_string(d, msg_ns3);
+              } else {
+                queue_string(d, msg_ns2);
+              }
+           }
            else
 	      queue_string(d, strip_safe_accents(message));
 #else	   
@@ -1490,6 +1538,7 @@ raw_broadcast(va_alist)
 #ifdef ZENTY_ANSI
     free_lbuf(message);
     free_lbuf(msg_ns2);
+    free_lbuf(msg_ns3);
 #endif
     va_end(ap);
     VOIDRETURN; /* #114 */
@@ -1701,9 +1750,9 @@ queue_string(DESC * d, const char *s)
 	new = strip_ansi(s);
     else if (!ShowAnsiColor(d->player) && index(s, ESC_CHAR))
 	new = strip_ansi_color(s);
-    else if (!ShowAnsiXterm(d->player) && index(s, ESC_CHAR))
-        new = strip_ansi_xterm(s);
-    else
+    else if (!ShowAnsiXterm(d->player) && index(s, ESC_CHAR)){
+        new = strip_ansi_xterm(d, s);
+  } else
 	new = (char *) s;
     if (NoFlash(d->player) && index(new, ESC_CHAR))
 	new = strip_ansi_flash(new);
@@ -2721,9 +2770,9 @@ dump_users(DESC * e, char *match, int key)
     DESC *d;
     int count, rcount = 0;
     time_t now;
-    char *buf, *fp, *gp, *doingAnsiBuf, *doingAccentBuf, *pDoing; 
+    char *buf, *fp, *gp, *doingAnsiBuf, *doingAccentBuf, *doingBytesBuf, *pDoing; 
 #ifdef ZENTY_ANSI
-    char *doingAnsiBufp, *abuf, *abufp, *msg_ns2, *mp2, *doingAccentBufp;
+    char *doingAnsiBufp, *abuf, *abufp, *msg_ns2, *mp2, *msg_ns3, *mp3, *doingAccentBufp, *doingBytesBufp;
 #endif
     char smallbuf[25];
     char antemp[20];
@@ -2746,6 +2795,7 @@ dump_users(DESC * e, char *match, int key)
     buf = alloc_lbuf("dump_users");
     doingAnsiBuf = alloc_lbuf("dump_users_ansi");
     doingAccentBuf = alloc_lbuf("dump_users_accents");
+    doingBytesBuf = alloc_lbuf("dump_users_bytes");
     tprp_buff = tpr_buff = alloc_lbuf("dump_users_tprintf");
 
     time(&now);
@@ -2776,14 +2826,22 @@ dump_users(DESC * e, char *match, int key)
 #ifdef ZENTY_ANSI
            abufp = abuf = alloc_lbuf("doing_header");
            mp2 = msg_ns2 = alloc_lbuf("notify_check_accents");
-	   parse_ansi(mudstate.ng_doing_hdr, abuf, &abufp, msg_ns2, &mp2);
+           mp3 = msg_ns3 = alloc_lbuf("notify_check_bytes");
+	   parse_ansi(mudstate.ng_doing_hdr, abuf, &abufp, msg_ns2, &mp2, msg_ns3, &mp3);
            *mp2 = '\0';
+           *mp3 = '\0';
            if ( Accents(e->player) ) {
-	      queue_string(e, msg_ns2);
+              if(Bytes(e->player)) {
+                queue_string(e, msg_ns3);
+              } else {
+                queue_string(e, msg_ns2);
+
+              }
            } else {
-	      queue_string(e, strip_safe_accents(abuf));
+	           queue_string(e, strip_safe_accents(abuf));
            }
            free_lbuf(msg_ns2);
+           free_lbuf(msg_ns3);
            free_lbuf(abuf);
 #else
 	   queue_string(e, mudstate.ng_doing_hdr);
@@ -2793,16 +2851,24 @@ dump_users(DESC * e, char *match, int key)
 #ifdef ZENTY_ANSI
            abufp = abuf = alloc_lbuf("doing_header");
            mp2 = msg_ns2 = alloc_lbuf("notify_check_accents");
-	   parse_ansi(mudstate.doing_hdr, abuf, &abufp, msg_ns2, &mp2);
+           mp3 = msg_ns3 = alloc_lbuf("notify_check_bytes");
+	   parse_ansi(mudstate.doing_hdr, abuf, &abufp, msg_ns2, &mp2, msg_ns3, &mp3);
            *mp2 = '\0';
+           *mp3 = '\0';
            if ( Accents(e->player) ) {
-	      queue_string(e, safe_tprintf(tpr_buff, &tprp_buff, "%-11s %s", 
+              if(Bytes(e->player)) {
+                queue_string(e, safe_tprintf(tpr_buff, &tprp_buff, "%-11s %s", 
+                           mudstate.guild_hdr, msg_ns3));
+              } else {
+                queue_string(e, safe_tprintf(tpr_buff, &tprp_buff, "%-11s %s", 
                            mudstate.guild_hdr, msg_ns2));
+              }
            } else {
 	      queue_string(e, safe_tprintf(tpr_buff, &tprp_buff, "%-11s %s", 
                            mudstate.guild_hdr, strip_safe_accents(abuf)));
            }
            free_lbuf(msg_ns2);
+           free_lbuf(msg_ns3);
            free_lbuf(abuf);
 #else
 	   queue_string(e, safe_tprintf(tpr_buff, &tprp_buff, "%-11s %s",
@@ -2818,9 +2884,14 @@ dump_users(DESC * e, char *match, int key)
 #ifdef ZENTY_ANSI
 	doingAnsiBufp = doingAnsiBuf;
 	doingAccentBufp = doingAccentBuf;
-	parse_ansi(d->doing, doingAnsiBuf, &doingAnsiBufp, doingAccentBuf, &doingAccentBufp);
+  doingBytesBufp = doingBytesBuf;
+	parse_ansi(d->doing, doingAnsiBuf, &doingAnsiBufp, doingAccentBuf, &doingAccentBufp, doingBytesBuf, &doingBytesBufp);
         if ( !Accents(e->player) ) {
            strcpy(doingAccentBuf, strip_safe_accents(doingAnsiBuf));
+        
+          if( !Bytes(e->player) ) {
+             strcpy(doingBytesBuf, strip_safe_accents(doingAccentBuf)); //TODO: Write a strip_safe_bytes function
+          }
         }
 	pDoing = doingAccentBuf;
 #else
@@ -3125,6 +3196,7 @@ dump_users(DESC * e, char *match, int key)
     free_lbuf(buf);
     free_lbuf(doingAnsiBuf);
     free_lbuf(doingAccentBuf);
+    free_lbuf(doingBytesBuf);
     free_lbuf(tpr_buff);
     VOIDRETURN; /* #139 */
 }
