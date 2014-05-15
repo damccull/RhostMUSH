@@ -8,7 +8,11 @@ RhostMUSH has a developer hangout MUSH at iweb.localecho.net 4201 - please feel 
 ##Online help files for RhostMUSH exist.
 
 ###Mortal Help
-Mortal Help HTML format
+[Mortal Help HTML format][1]
 
 ###Wizard Help
-Wizard Help HTML format
+[Wizard Help HTML format][1]
+
+
+[1] http://rhostmush.com/autohelp/help.html Mortal Help
+[2] http://rhostmush.com/autohelp/wizhelp.html Wizard Help
