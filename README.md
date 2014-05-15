@@ -5,10 +5,10 @@ RhostMUSH is a security hardened text-based multiplayer RPG server initially bas
 
 RhostMUSH has a developer hangout MUSH at iweb.localecho.net 4201 - please feel free to connect there if you want to reach us, or need help with anything.
 
-#Online help files for RhostMUSH exist.
+##Online help files for RhostMUSH exist.
 
-##Mortal Help
+###Mortal Help
 Mortal Help HTML format
 
-##Wizard Help
+###Wizard Help
 Wizard Help HTML format
