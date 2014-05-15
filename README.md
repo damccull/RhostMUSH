@@ -14,5 +14,5 @@ RhostMUSH has a developer hangout MUSH at iweb.localecho.net 4201 - please feel 
 [Wizard Help HTML format][1]
 
 
-[1]: http://rhostmush.com/autohelp/help.html Mortal Help
-[2]: http://rhostmush.com/autohelp/wizhelp.html Wizard Help
+[1]: http://rhostmush.com/autohelp/help.html "Mortal Help"
+[2]: http://rhostmush.com/autohelp/wizhelp.html "Wizard Help"
