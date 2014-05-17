@@ -170,20 +170,16 @@ const char szBlowfishPrefix[BLOWFISH_PREFIX_LENGTH+1] = "$2a$";
 int
 encode_base64(const char *input, int len, char *buff, char **bp)
 {
-    static char buf[SHA1_PREFIX_LENGTH + ENCODED_SALT_LENGTH + 1 + ENCODED_HASH_LENGTH + 1 + 16];
-    char *pSaltField = NULL;
+  BIO *bio, *b64, *bmem;
+  char *membuf;
 
   b64 = BIO_new(BIO_f_base64());
   if (!b64) {
     safe_str((char *)"#-1 ALLOCATION ERROR", buff, bp);
     return 0;
   }
-notify(1234,"Running muxcrypt");
-notify(1234, unsafe_tprintf("Value1-A: %s", szSetting));
-notify(1234, unsafe_tprintf("Value1-B: %s", szPassword));
 
-notify(1234, unsafe_tprintf("Salt: %d/%s", nSaltField, pSaltField));
-notify(1234, unsafe_tprintf("Salt2: %d/%s", nSaltField, pSaltField));
+  BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
 
   bmem = BIO_new(BIO_s_mem());
   if (!bmem) {
@@ -202,7 +198,7 @@ notify(1234, unsafe_tprintf("Salt2: %d/%s", nSaltField, pSaltField));
 
   (void) BIO_flush(bio);
 
-    // Calculate SHA-1 Hash.
+  len = BIO_get_mem_data(bmem, &membuf);
 
   safe_copy_str(membuf, buff, bp, ((len > (LBUF_SIZE - 2)) ? (LBUF_SIZE - 2) : len));
 
@@ -304,6 +300,7 @@ check_mux_password(const char *saved, const char *password)
    EVP_DigestUpdate(&ctx, start, strlen(start));
    EVP_DigestUpdate(&ctx, password, strlen(password));
    EVP_DigestFinal(&ctx, hash, &rlen);
+
    /* Decode the stored password */
    dp = decoded;
    decode_base64(end, strlen(end), decoded, &dp);
@@ -328,16 +325,10 @@ decode_base64(const char *input, int len, char *buff, char **bp)
    return 0;
 }
 
-    //          1         2         3         4
-    // 12345678901234567890123456789012345678901234567
-    // $SHA1$ssssssssssss$hhhhhhhhhhhhhhhhhhhhhhhhhhhh
-    //
-    memset(buf, '\0', sizeof(buf));
-    strncpy(buf, szSHA1Prefix, SHA1_PREFIX_LENGTH);
-    memcpy(buf + SHA1_PREFIX_LENGTH, pSaltField, nSaltField);
-    buf[SHA1_PREFIX_LENGTH + nSaltField] = '$';
-    EncodeBase64(20, szHashRaw, buf + SHA1_PREFIX_LENGTH + nSaltField + 1);
-    return buf;
+int
+check_mux_password(const char *saved, const char *password) 
+{
+   return 0;
 }
 #endif
 

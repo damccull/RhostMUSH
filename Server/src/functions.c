@@ -70,12 +70,11 @@ typedef struct PENN_COLORMAP {
   int i_xterm;
 } PENNANSI;
 
-//Moved to externs.h for fansi patch
-/*typedef struct MUX_COLORMAP {
+typedef struct MUX_COLORMAP {
   int i_dec;
   char *s_hex;
 } MUXANSI;
-*/
+
 
 char *ansi_translate_16[257]={
    "x", "r", "g", "y", "b", "m", "c", "w",
@@ -112,8 +111,7 @@ char *ansi_translate_16[257]={
    "wh", "wh", "wh", "wh", "wh", "wh", "wh", "wh", (char *)NULL,
 };
 
-//Moved to externs.h for fansi patch
-/*#ifdef ZENTY_ANSI
+#ifdef ZENTY_ANSI
 static struct MUX_COLORMAP mux_namecolors[] = {
     {0, "000000"},
     {1, "800000"},
@@ -373,7 +371,7 @@ static struct MUX_COLORMAP mux_namecolors[] = {
     {255, "eeeeee"},
     {0, NULL},
 };
-#endif*/
+#endif
 
 static struct PENN_COLORMAP penn_namecolors[]= {
    {"aliceblue", 15 },
