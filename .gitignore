@@ -8,6 +8,7 @@ svn-migration-scripts.jar
 # Object files
 *.o
 *.ko
+*.lo
 *.obj
 *.elf
 
@@ -28,3 +29,10 @@ svn-migration-scripts.jar
 *.i*86
 *.x86_64
 *.hex
+
+### Rhost ###
+Server/src/Makefile*
+Server/src/gdbm*
+Server/src/intsize
+Server/src/date.txt
+bin
