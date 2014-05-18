@@ -35,4 +35,12 @@ Server/src/Makefile*
 Server/src/gdbm*
 Server/src/intsize
 Server/src/date.txt
+Server/src/buildnum.data
+Server/game/data
+Server/game/kill_*.sh
+Server/game/*.gamelog
+Server/game/*.pid
+Server/game/*.log*
+Server/game/oldlogs
+Server/game/txt/*.indx
 bin
