@@ -28,12 +28,17 @@
 ### Rhost Specific ###
 
 #bin files
-bin/dbconvert
-bin/mkhtml
-bin/mkindx
-bin/murboot
-bin/netrhost
-bin/netrhost.debugmon
+Server/bin/dbconvert
+Server/bin/mkhtml
+Server/bin/mkindx
+Server/bin/murboot
+Server/bin/netrhost
+Server/bin/netrhost.debugmon
 
 # Source files
-src/Makefile* #Makefile.template is manually tracked. Ignore all others.
+#   Makefile.template is manually tracked. Ignore all others.
+Server/src/Makefile*
+Server/src/gdbm*
+Server/src/intsize
+Server/src/buildnum.data
+Server/src/date.txt
