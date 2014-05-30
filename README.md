@@ -7,6 +7,24 @@ RhostMUSH is a security hardened text-based multiplayer RPG server initially bas
 
 RhostMUSH has a developer hangout MUSH at iweb.localecho.net 4201 - please feel free to connect there if you want to reach us, or need help with anything.
 
+##Getting Started
+* Download one of the releases and extract it.
+* Ensure this path exists {Extraction Folder}/Rhost/Server/game/data. If the data folder doesn't exist, create it.
+* Change your directory to {Extraction Folder}/Rhost/Server
+* Type 'make confsource'
+* Select the options you want and choose 'r'
+* Watch your mush build
+* Change your directory to {Extraction Folder}/Rhost/Server/game
+* Edit netrhost.conf according to your wishes and close it
+* Type ./Startmush
+* Connect to the server and port you specified
+* Login as '#1' with the password 'Nyctasia'
+* Type '@newpass me=<a new password>' in the mush client
+* Type @dump in the mush client
+* Type @shutdown in the mushclient
+* Restart your mush with ./Startmush in the shell and go play
+
+
 ##Online help files for RhostMUSH exist.
 
 ###Mortal Help
