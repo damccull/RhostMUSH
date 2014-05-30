@@ -1261,6 +1261,12 @@ setlibs() {
 # UPDATEMAKEFILE - Update the makefile with the changes
 ###################################################################
 updatemakefile() {
+#  Check if a Makefile exists. If not, copy the .template file.
+   if [ ! -f "../src/Makefile" ]
+   then
+      cp -f ../src/Makefile.template ../src/Makefile
+   fi
+
    echo "Updating the DEFS section of the Makefile now.  Please wait..."
    cat ../src/Makefile|sed "s/$(grep ^DEF ../src/Makefile|sed "s/\//\\\\\//g")/${DEFS}/g" > /tmp/$$CONF$$
    mv -f ../src/Makefile ../src/Makefile.${DATE} 2>/dev/null
