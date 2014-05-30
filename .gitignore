@@ -36,8 +36,9 @@ Server/bin/netrhost
 Server/bin/netrhost.debugmon
 
 # Source files
-#   Makefile.template is manually tracked. Ignore all others.
 Server/src/Makefile*
+#  Makefile.template is manually tracked. Ignore all others.
+!Server/src/Makefile.template
 Server/src/gdbm*
 Server/src/intsize
 Server/src/buildnum.data
