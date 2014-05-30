@@ -1,16 +1,22 @@
-#Ignores files needed for SVN conversion
-authors.sh
-svn-migration-scripts.jar
-
+##### GLOBAL GITIGNORE #####
+## This file allows the git repo to ignore certain files that may not be desirable
+## to store in the repository. Examples are generated files, compiled files, user-
+## modified files, etc. All files that should be ignored are listed in this file.
+##
+## Some exceptions exist to ignore patterns. These are files that should  be included
+## in the repository even if they match an ignore pattern. They are listed with with
+## and ! in front of the line. While git doesn't techinically need this if it's already
+## tracking the excepted files, it helps to document that a file should be explicitly
+## included in the repository.
 
 ###C###
 
 # Object files
 *.o
 *.ko
-*.lo
 *.obj
 *.elf
+*.lo
 
 # Libraries
 *.lib
@@ -30,17 +36,58 @@ svn-migration-scripts.jar
 *.x86_64
 *.hex
 
-### Rhost ###
+### Rhost Specific ###
+
+#bin files
+Server/bin/dbconvert
+Server/bin/mkhtml
+Server/bin/mkindx
+Server/bin/murboot
+Server/bin/netrhost
+Server/bin/netrhost.debugmon
+
+# Sourcee
 Server/src/Makefile*
+#  Makefile.template is manually tracked. Ignore all others.
+!Server/src/Makefile.template
 Server/src/gdbm*
 Server/src/intsize
-Server/src/date.txt
 Server/src/buildnum.data
+Server/src/date.txt
+
+# game folder
+Server/game/kill_*
+Server/game/netrhost.gamelog
+Server/game/netrhost.pid
+Server/game/netrhost.log
+Server/game/netrhost.log.old
+Server/game/oldlogs*
+
+# game/data folder
 Server/game/data
-Server/game/kill_*.sh
-Server/game/*.gamelog
-Server/game/*.pid
-Server/game/*.log*
-Server/game/oldlogs
-Server/game/txt/*.indx
-bin
+
+# game/txt folder
+Server/game/txt/*
+#  Explicitly include distro files
+!Server/game/txt/areghost.txt
+!Server/game/txt/autoreg_include.txt
+!Server/game/txt/autoreg.txt
+!Server/game/txt/badsite.txt
+!Server/game/txt/connect.txt
+!Server/game/txt/create_reg.txt
+!Server/game/txt/doorconf.txt
+!Server/game/txt/doors.txt
+!Server/game/txt/down.txt
+!Server/game/txt/error.txt
+!Server/game/txt/full.txt
+!Server/game/txt/guest.txt
+!Server/game/txt/help.txt
+!Server/game/txt/motd.txt
+!Server/game/txt/news.txt
+!Server/game/txt/newuser.txt
+!Server/game/txt/noguest.txt
+!Server/game/txt/plushelp.txt
+!Server/game/txt/quit.txt
+!Server/game/txt/register.txt
+!Server/game/txt/wizhelp.txt
+!Server/game/txt/wizmotd.txt
