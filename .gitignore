@@ -47,6 +47,7 @@ Server/bin/mkindx
 Server/bin/murboot
 Server/bin/netrhost
 Server/bin/netrhost.debugmon
+Server/bin/asksource.save*
 
 # Sourcee
 Server/src/Makefile*
