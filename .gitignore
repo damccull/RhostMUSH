@@ -38,6 +38,8 @@
 
 ### Rhost Specific ###
 
+*~
+
 #bin files
 Server/bin/dbconvert
 Server/bin/mkhtml
