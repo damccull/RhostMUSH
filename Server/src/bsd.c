@@ -65,6 +65,7 @@ extern char *t_errlist[];
 #endif
 
 extern void NDECL(dispatch);
+void NDECL(pcache_sync);
 
 static int sock;
 int ndescriptors = 0;
@@ -264,6 +265,7 @@ shovechars(int port)
          } else {
             queue_string(d, "Your @program was aborted from the @reboot.\r\n");
             s_Flags4(d->player, (Flags4(d->player) & (~INPROGRAM)));
+            queue_string(d, "\377\371");
             mudstate.shell_program = 0;
             atr_clr(d->player, A_PROGBUFFER);
             atr_clr(d->player, A_PROGPROMPTBUF);
@@ -1585,19 +1587,19 @@ process_output(DESC * d)
     RETURN(1); /* #12 */
 }
 
-
 int 
 process_input(DESC * d)
 {
     static char buf[LBUF_SIZE];
     int got, in, lost;
-    char *p, *pend, *q, *qend;
+    char *p, *pend, *q, *qend, qfind[8], *qf;
     char *cmdsave;
 
     DPUSH; /* #16 */
     cmdsave = mudstate.debug_cmd;
     mudstate.debug_cmd = (char *) "< process_input >";
 
+    memset(qfind, '\0', sizeof(qfind));
     got = in = READ(d->descriptor, buf, sizeof buf);
     if (got <= 0) {
 	mudstate.debug_cmd = cmdsave;
@@ -1632,8 +1634,16 @@ process_input(DESC * d)
 		p--;
 	    if (p < d->raw_input_at)
 		(d->raw_input_at)--;
-	} else if (p < pend && isascii((int)*q) && isprint((int)*q)) {
+  	} else if (p < pend && isascii((int)*q) && isprint((int)*q)) {
 	    *p++ = *q;
+        } else if ( (((int)(unsigned char)*q) > 160) && (((int)(unsigned char)*q) < 250) && ((p+10) < pend) ) {
+            sprintf(qfind, "%c<%3d>", '%', (int)(unsigned char)*q);
+            qf = qfind;
+            in+=5;
+            got+=5;
+            while ( *qf ) {
+               *p++ = *qf++;
+            }
 	} else {
 	    in--;
 	    if (p >= pend)
@@ -2110,6 +2120,10 @@ sighandler(int sig)
         ENDLOG
         raw_broadcast(0, 0, "Game: Emergency dump complete, exiting...");
         DPOP;
+        /* QDBM was giving some weird-ass corruption, this should hopefully fix it */
+        pcache_sync();
+        SYNC;
+        CLOSE;
         exit(1); /* Brutal. But daddy said I had to go to bed now. */
         break; 
     case SIGQUIT:		/* Normal shutdown */

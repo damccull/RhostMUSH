@@ -387,9 +387,16 @@ struct confdata {
 	char	cap_conjunctions[LBUF_SIZE];	/* caplist exceptions */
 	char	cap_articles[LBUF_SIZE];	/* caplist exceptions */
 	char	cap_preposition[LBUF_SIZE];	/* caplist exceptions */
+        char    atrperms[LBUF_SIZE];
+        int	atrperms_max;
+        int	safer_ufun;
 	int	includenest;	/* Max number of nesting of @include */
 	int	includecnt;	/* Total number of @includes in the command caller */
+	int	lfunction_max;	/* Maximum lfunctions allowed */
+        int	blind_snuffs_cons;	/* Does the BLIND flag snuff aconnect/adisconnect */
+	int	listen_parents;	/* ^listens handle parents */
 #ifdef REALITY_LEVELS
+        int reality_compare;	/* How descs are displayed in reality */
         int no_levels;          /* # of reality levels */
         struct rlevel_def {
             char name[9];	/* name of level */
@@ -441,6 +448,8 @@ struct confdata {
 	int	ifelse_substitutions;	/* Do @switch/switch()/switchall() allow #$ subs? */
 	int	enforce_unfindable;	/* Enforce unfindable on target */
 	int	power_objects;		/* Objects can have powers */
+	int	lfunction_max;	/* Maximum lfunctions allowed */
+        int	blind_snuffs_cons;	/* Does the BLIND flag snuff aconnect/adisconnect */
 	char	sub_include[200];
 	int	old_elist;		/* Old elist processing */
 #endif	/* STANDALONE */
@@ -503,6 +512,8 @@ struct statedata {
         /* command profiling */
         int     objevalst;
 	int	breakst;
+	int	breakdolist;
+	int	dolistnest;
         int     shell_program;  /* Shelled out of @program */
         dbref   store_lastcr;   /* Store the last created dbref# for functions */
 	dbref	store_lastx1;	/* Store the last created exit# for dig */
@@ -525,6 +536,8 @@ struct statedata {
         int     iter_inumarr[50];/* Iter recursive memory - number*/
         int     iter_inumbrk[50];/* Iter recursive memory - break*/
         int     iter_inum;      /* Iter inum value */
+	int	dol_inumarr[50];/* Dolist array */
+	char	*dol_arr[50];	/* Dolist Array */
 	int	alarm_triggered;/* Has periodic alarm signal occurred? */
 	time_t	now;		/* What time is it now? */
 	time_t	lastnow;	/* What time was it last? */
@@ -566,6 +579,7 @@ struct statedata {
 	HASHTAB	logout_cmd_htab;/* Logged-out commands hashtable (WHO, etc) */
 	HASHTAB func_htab;	/* Functions hashtable */
 	HASHTAB ufunc_htab;	/* Local functions hashtable */
+	HASHTAB ulfunc_htab;	/* User-Defiend Local functions hashtable */
 	HASHTAB flags_htab;	/* Flags hashtable */
 	HASHTAB toggles_htab;	/* Toggles hashtable */
 	HASHTAB powers_htab;
@@ -695,6 +709,7 @@ struct statedata {
 	int	nocodeoverride;	/* Override NO_CODE flag for objeval() */
 	int	notrace;	/* Do not trace */
 	int	start_of_cmds;	/* Start of command -- hack around zenty ansi */
+        int	twinknum;	/* Dbref of twink object if inside twinklock */
         BLACKLIST *bl_list; 	/* The black list */
 #else
 	int	logging;	/* Are we in the middle of logging? */

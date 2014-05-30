@@ -99,6 +99,7 @@ void execute_entry(BQUE *queue)
 
 		command = queue->comm;
 		mudstate.breakst = 0;
+                mudstate.breakdolist = 0;
                 mudstate.includecnt = 0;
                 mudstate.force_halt =0;
 		while (command && !mudstate.breakst) {
@@ -2287,7 +2288,6 @@ show_que_func(dbref player, char *target, int key, char s_type, char *buff, char
          if ( i_pid <= 0 )
             i_pid = -1;
       } else {
-//       player_targ = Owner(player);
          player_targ = player;
          init_match(player, target, NOTYPE);
          match_everything(MAT_EXIT_PARENTS);
