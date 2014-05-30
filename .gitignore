@@ -35,7 +35,7 @@ Server/bin/murboot
 Server/bin/netrhost
 Server/bin/netrhost.debugmon
 
-# Source files
+# Sourcee
 Server/src/Makefile*
 #  Makefile.template is manually tracked. Ignore all others.
 !Server/src/Makefile.template
@@ -43,3 +43,17 @@ Server/src/gdbm*
 Server/src/intsize
 Server/src/buildnum.data
 Server/src/date.txt
+
+# game folder
+Server/game/kill_*
+Server/game/netrhost.gamelog
+Server/game/netrhost.pid
+Server/game/netrhost.log
+Server/game/netrhost.log.old
+Server/game/oldlogs*
+
+# game/data folder
+Server/game/data
+
+# game/txt folder
+Server/game/txt/*.indx
