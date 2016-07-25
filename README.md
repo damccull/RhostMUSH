@@ -34,6 +34,9 @@ RhostMUSH has a developer hangout MUSH at iweb.localecho.net 4201 - please feel 
 [Wizard Help HTML format][1]
 
 ##FANSI Support
+
+Note: FANSI support is based on an older version of the game. I have no intention of updating it further. If you wish to update it, please feel free to send a pull request.
+
 This repository has a branch of RhostMUSH that supports the [FANSI 2.0 standard][4]. While the basic version supports xterm256 colors and certain accent characters already, the FANSI branch adds the ability for all of the FANSI 2.0 extended characters in the IBM/OEM character set. It also supports the Mud Extension Protocol(MXP)'s COLOR tag to enable 256 colors on clients which support MXP but do not support xterm256. See the wiki for help with FANSI options. Download the FANSI release under the [Releases][3] tab.
 
 
